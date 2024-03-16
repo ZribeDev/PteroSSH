@@ -22,11 +22,14 @@ ssh your_username@your_server_ip
 
 ### 2. Modify Pterodactyl Configuration
 
+Run the following commands as root user:
+
 ```bash
-sudo sed -i '/allowed_origins: \[\]/c\allowed_origins:\n- '\''*'\''' /etc/pterodactyl/config.yml
+sed -i '/allowed_origins: \[\]/c\allowed_origins:\n- '\''*'\''' /etc/pterodactyl/config.yml
+systemctl restart wings
 ```
 
-- After running this command you can exit SSH!
+- After running these commands you can exit SSH!
 
 ### 3. Execute the Connect Script
 

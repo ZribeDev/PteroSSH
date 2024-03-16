@@ -34,32 +34,41 @@ def get_websocket_details(panel_url, server_id, api_key):
 async def interact_with_websocket(socket_url, token):
     
     print(f"Connecting to WebSocket at {socket_url}")
-    async with websockets.connect(socket_url) as websocket:
-        await websocket.send(json.dumps({"event": "auth", "args": [token]}))
+    try:
+        async with websockets.connect(socket_url) as websocket:
+            print(f"Connected to WebSocket")
+            await websocket.send(json.dumps({"event": "auth", "args": [token]}))
 
-        async def send_commands():
-            while True:
-                command = await ainput("")
-                await websocket.send(json.dumps({"event": "send command", "args": [command]}))
-                
-        async def receive_messages():
-            global ignoreafter
-            while True:
-                message = await websocket.recv()
-                message_data = json.loads(message)
-                if message_data.get("event") == "console output":
-                    await aprint(f"Console Output: {list(message_data.get('args'))[0]}")
+            async def send_commands():
+                while True:
+                    command = await ainput("")
+                    await websocket.send(json.dumps({"event": "send command", "args": [command]}))
+                    
+            async def receive_messages():
+                global ignoreafter
+                while True:
+                    message = await websocket.recv()
+                    message_data = json.loads(message)
+                    if message_data.get("event") == "console output":
+                        await aprint(f"Console Output: {list(message_data.get('args'))[0]}")
 
-                #elif message_data.get("event") == "stats":
-                #    await aprint(f"Stats: {message_data.get('args')}")
-                #else:
-                #    await aprint(f"Message: {message}")
+                    #elif message_data.get("event") == "stats":
+                    #    await aprint(f"Stats: {message_data.get('args')}")
+                    #else:
+                    #    await aprint(f"Message: {message}")
 
-        sender_task = asyncio.create_task(send_commands())
-        receiver_task = asyncio.create_task(receive_messages())
+            sender_task = asyncio.create_task(send_commands())
+            receiver_task = asyncio.create_task(receive_messages())
 
-        await asyncio.gather(sender_task, receiver_task)
-
+            await asyncio.gather(sender_task, receiver_task)
+    except websockets.exceptions.WebSocketException as e:
+        if e.status_code == 403:
+            print("")
+            print("")
+            print("Failed to connect to Web Socket.")
+            print("")
+            print("If you are a server owner, you need to follow the guide on our GitHub repo: https://github.com/ZribeDev/PteroSSH\n\n"
+                  "If you are a client, please contact your provider.")
 def main():
     if len(sys.argv) != 2:
         print("Usage: connect.py <server_id>")
