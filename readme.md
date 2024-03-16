@@ -49,3 +49,7 @@ To complete the connection, you need your API key and the URL of the Pterodactyl
 ### 5. Input API Key and Panel URL
 
 When prompted by the `connect.py` script, input the API key and the URL of the Pterodactyl panel to finally connect.
+
+# How to run commands?
+
+Just send them as input on a blank link, press enter, and u get instant output.
