@@ -31,6 +31,7 @@ def load_or_create_config():
     except (FileNotFoundError, ValueError):
         api_key = input('Enter your Pterodactyl API key: ')
         panel_url = input('Enter the Pterodactyl panel URL: ')
+        panel_url = panel_url[:-1] if panel_url.endswith('/') else panel_url
         config = {'api_key': api_key, 'panel_url': panel_url, 'hide_original_response': True}
         with open(CONFIG_FILE, 'w') as file:
             json.dump(config, file)
@@ -89,11 +90,11 @@ async def interact_with_websocket(socket_url, token):
     except websockets.exceptions.WebSocketException as e:
         if e.status_code == 403:
             print("")
-            print("")
             log_negative("Failed to connect to Web Socket.")
             print("")
-            log_negative("If you are a server owner, you need to follow the guide on our GitHub repo: https://github.com/ZribeDev/PteroSSH\n\n"
-                  "If you are a client, please contact your provider.")
+            log_negative("If you are a server owner, you need to follow the guide on our GitHub repo: https://github.com/ZribeDev/PteroSSH")
+            print("")
+            log_negative("If you are a client, please contact your provider.")
 def main():
     if len(sys.argv) != 2:
         print("Usage: connect.py <server_id>")
