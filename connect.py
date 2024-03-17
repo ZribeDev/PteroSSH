@@ -114,7 +114,7 @@ def main():
             log_negative("Failed to obtain WebSocket details from the API.")
             log_negative("Please check if the API key is correct and has the necessary permissions.")
             log_negative("Also, ensure the panel URL and server ID are correct.")
-    return
+        return
     asyncio.run(interact_with_websocket(socket_url, token))
 
 if __name__ == '__main__':
