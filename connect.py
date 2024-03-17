@@ -94,7 +94,9 @@ async def interact_with_websocket(socket_url, token):
             print("")
             log_negative("If you are a server owner, you need to follow the guide on our GitHub repo: https://github.com/ZribeDev/PteroSSH")
             print("")
-            log_negative("If you are a client, please contact your provider.")
+            log_negative("If you are a client:")
+            log_negative("* Your provider might not have set up PteroSSH Correctly.")
+            log_negative("* You might not have the correct permissions to the selected server.")
 def main():
     if len(sys.argv) != 2:
         print("Usage: connect.py <server_id>")
