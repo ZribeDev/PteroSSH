@@ -89,14 +89,13 @@ async def interact_with_websocket(socket_url, token):
             await asyncio.gather(sender_task, receiver_task)
     except websockets.exceptions.WebSocketException as e:
         if e.status_code == 403:
-            print("")
-            log_negative("Failed to connect to Web Socket.")
-            print("")
+            log_negative("\nFailed to connect to Web Socket.\n")
             log_negative("If you are a server owner, you need to follow the guide on our GitHub repo: https://github.com/ZribeDev/PteroSSH")
-            print("")
-            log_negative("If you are a client:")
-            log_negative("* Your provider might not have set up PteroSSH Correctly.")
+            log_negative("\nIf you are a client:")
+            log_negative("* Your provider might not have set up PteroSSH correctly.")
             log_negative("* You might not have the correct permissions to the selected server.")
+            
+    
 def main():
     if len(sys.argv) != 2:
         print("Usage: connect.py <server_id>")
@@ -107,8 +106,15 @@ def main():
     api_key = config['api_key']
     panel_url = config['panel_url']
 
-    token, socket_url = get_websocket_details(panel_url, server_id, api_key)
-
+    try:
+        token, socket_url = get_websocket_details(panel_url, server_id, api_key)
+    except Exception as e:
+        log_negative(f"An error occurred: {e}")
+        if "Failed to get WebSocket details from the API" in str(e):
+            log_negative("Failed to obtain WebSocket details from the API.")
+            log_negative("Please check if the API key is correct and has the necessary permissions.")
+            log_negative("Also, ensure the panel URL and server ID are correct.")
+    return
     asyncio.run(interact_with_websocket(socket_url, token))
 
 if __name__ == '__main__':
