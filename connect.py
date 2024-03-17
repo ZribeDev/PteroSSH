@@ -11,16 +11,18 @@ def load_or_create_config():
     try:
         with open(CONFIG_FILE, 'r') as file:
             config = json.load(file)
-        if 'api_key' not in config or 'panel_url' not in config:
+        if 'api_key' not in config or 'panel_url' not in config or 'hide_original_response' not in config:
             raise ValueError("Invalid config: 'api_key' or 'panel_url' is missing.")
     except (FileNotFoundError, ValueError):
         api_key = input('Enter your Pterodactyl API key: ')
         panel_url = input('Enter the Pterodactyl panel URL: ')
-        config = {'api_key': api_key, 'panel_url': panel_url}
+        config = {'api_key': api_key, 'panel_url': panel_url, 'hide_original_response': True}
         with open(CONFIG_FILE, 'w') as file:
             json.dump(config, file)
     return config
-
+last_command = ''
+config = load_or_create_config()
+hidelastcmd = config['hide_original_response']
 def get_websocket_details(panel_url, server_id, api_key):
     url = f"{panel_url}/api/client/servers/{server_id}/websocket"
     headers = {"Authorization": f"Bearer {api_key}", "Accept": "application/json", "Content-Type": "application/json"}
@@ -32,7 +34,7 @@ def get_websocket_details(panel_url, server_id, api_key):
         raise Exception("Failed to get WebSocket details from the API")
 
 async def interact_with_websocket(socket_url, token):
-    
+    global last_command, hidelastcmd
     print(f"Connecting to WebSocket at {socket_url}")
     try:
         async with websockets.connect(socket_url) as websocket:
@@ -40,17 +42,25 @@ async def interact_with_websocket(socket_url, token):
             await websocket.send(json.dumps({"event": "auth", "args": [token]}))
 
             async def send_commands():
+                global hidelastcmd, last_command
                 while True:
                     command = await ainput("")
+                    last_command = command
                     await websocket.send(json.dumps({"event": "send command", "args": [command]}))
                     
             async def receive_messages():
-                global ignoreafter
+                global ignoreafter, hidelastcmd, last_command
                 while True:
                     message = await websocket.recv()
                     message_data = json.loads(message)
                     if message_data.get("event") == "console output":
-                        await aprint(f"Console Output: {list(message_data.get('args'))[0]}")
+                        if (hidelastcmd):
+                            if not (list(message_data.get('args'))[0] == last_command):
+                                await aprint(f"{list(message_data.get('args'))[0]}")
+                                last_command = ''
+                            continue
+                        else:
+                            await aprint(f"{list(message_data.get('args'))[0]}")
 
                     #elif message_data.get("event") == "stats":
                     #    await aprint(f"Stats: {message_data.get('args')}")
