@@ -4,6 +4,21 @@ import requests
 import sys
 from aioconsole import ainput, aprint
 import websockets
+from datetime import datetime
+from colorama import init,Fore,Back
+init(autoreset=True)
+def log_positive(txt):
+    now = datetime.now()
+    dt_string = now.strftime("%H:%M:%S")
+    print(f"{Fore.LIGHTBLACK_EX + dt_string} ({Fore.CYAN}+{Fore.LIGHTBLACK_EX}){Fore.CYAN} {txt}")
+def log_negative(txt):
+    now = datetime.now()
+    dt_string = now.strftime("%H:%M:%S")
+    print(f"{Fore.LIGHTBLACK_EX + dt_string} ({Fore.RED}-{Fore.LIGHTBLACK_EX}){Fore.RED} {txt}")
+def log_normal(txt):
+    now = datetime.now()
+    dt_string = now.strftime("%H:%M:%S")
+    print(f"{Fore.LIGHTBLACK_EX + dt_string} ({Fore.LIGHTBLUE_EX}~{Fore.LIGHTBLACK_EX}){Fore.LIGHTBLUE_EX} {txt}")
 
 CONFIG_FILE = 'config.json'
 
@@ -35,10 +50,10 @@ def get_websocket_details(panel_url, server_id, api_key):
 
 async def interact_with_websocket(socket_url, token):
     global last_command, hidelastcmd
-    print(f"Connecting to WebSocket at {socket_url}")
+    log_normal(f"Connecting to WebSocket at {socket_url}")
     try:
         async with websockets.connect(socket_url) as websocket:
-            print(f"Connected to WebSocket")
+            log_positive(f"Connected to WebSocket")
             await websocket.send(json.dumps({"event": "auth", "args": [token]}))
 
             async def send_commands():
@@ -75,9 +90,9 @@ async def interact_with_websocket(socket_url, token):
         if e.status_code == 403:
             print("")
             print("")
-            print("Failed to connect to Web Socket.")
+            log_negative("Failed to connect to Web Socket.")
             print("")
-            print("If you are a server owner, you need to follow the guide on our GitHub repo: https://github.com/ZribeDev/PteroSSH\n\n"
+            log_negative("If you are a server owner, you need to follow the guide on our GitHub repo: https://github.com/ZribeDev/PteroSSH\n\n"
                   "If you are a client, please contact your provider.")
 def main():
     if len(sys.argv) != 2:
