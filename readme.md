@@ -31,7 +31,13 @@ systemctl restart wings
 
 - After running these commands you can exit SSH!
 
-### 3. Execute the Connect Script
+### 3. Install libraries
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Execute the Connect Script
 
 ```bash
 python connect.py <server_id>
@@ -39,14 +45,14 @@ python connect.py <server_id>
 
 - The `<server_id>` can be found by looking at the URL when viewing your server on the Pterodactyl panel.
 
-### 4. Obtain API Key and Panel URL
+### 5. Obtain API Key and Panel URL
 
 To complete the connection, you need your API key and the URL of the Pterodactyl panel.
 
 - Go to your profile on the Pterodactyl panel to find or generate your API key.
 - The panel URL is the base URL you use to access the Pterodactyl website.
 
-### 5. Input API Key and Panel URL
+### 6. Input API Key and Panel URL
 
 When prompted by the `connect.py` script, input the API key and the URL of the Pterodactyl panel to finally connect.
 
